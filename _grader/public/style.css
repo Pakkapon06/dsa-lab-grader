@@ -101,11 +101,7 @@ header {
     display: flex; align-items: center; gap: 12px; padding: 0 16px; height: 52px;
     background: var(--surface); border-bottom: 1px solid var(--line); flex-shrink: 0;
 }
-.brand-mark {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 28px; height: 28px; border-radius: 8px; font-size: 15px;
-    background: var(--brand); color: var(--on-brand); box-shadow: var(--shadow-1);
-}
+.brand-img { display: block; width: 30px; height: 30px; }
 header h1 { font-size: 15px; font-weight: 680; margin: 0; letter-spacing: -0.015em; }
 header .root { color: var(--fg-dim); font-size: 12px; font-family: var(--mono); }
 header .spacer { flex: 1; }
