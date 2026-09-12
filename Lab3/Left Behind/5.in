@@ -1,0 +1,5 @@
+4 4
+LINK 1 2
+LINK 2 3
+LINK 3 4
+PRINT 1

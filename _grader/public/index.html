@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lab Grader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header>
+        <span class="brand-mark"><span class="ic" data-ic="zap"></span></span>
+        <h1>Lab Grader</h1>
+        <span class="root" id="rootPath"></span>
+        <span class="spacer"></span>
+        <button class="icon-btn" id="reloadBtn" title="สแกนโฟลเดอร์ใหม่"><span class="ic" data-ic="refresh"></span> Reload</button>
+        <button class="icon-btn" id="themeBtn" title="สลับธีม"><span class="ic" data-ic="moon"></span> ธีม</button>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="empty">กำลังโหลด…</div>
+        </aside>
+
+        <div class="main">
+            <div class="toolbar" id="toolbar" hidden>
+                <span class="prob-name" id="probName"></span>
+                <span class="grow"></span>
+                <span class="field">ภาษา
+                    <select id="langSel">
+                        <option value="cpp">C++</option>
+                        <option value="c">C</option>
+                    </select>
+                </span>
+                <span class="field">เทียบ
+                    <select id="modeSel">
+                        <option value="trim">trim (แนะนำ)</option>
+                        <option value="exact">exact</option>
+                    </select>
+                </span>
+                <span class="field">timeout
+                    <input type="number" id="timeoutInp" value="3000" min="200" max="15000" step="100" /> ms
+                </span>
+                <button class="btn ghost" id="solBtn" title="ดูเฉลยแบบ overlay (ไม่แทนที่โค้ด)"><span class="ic" data-ic="key"></span> เฉลย</button>
+                <button class="btn secondary" id="saveBtn"><span class="ic" data-ic="save"></span> Save</button>
+                <button class="btn run" id="gradeBtn"><span class="ic" data-ic="play"></span> Run</button>
+            </div>
+
+            <div class="content">
+                <div class="left-pane">
+                    <div class="tabbar">
+                        <button class="tab active" id="tabStatement" data-tab="statement"><span class="ic" data-ic="file"></span> โจทย์</button>
+                        <button class="tab" id="tabResults" data-tab="results"><span class="ic" data-ic="check"></span> ผล Grader</button>
+                    </div>
+                    <div class="tab-body">
+                        <div class="tab-panel active" id="panelStatement">
+                            <div class="empty">เลือกโจทย์จากด้านซ้าย</div>
+                        </div>
+                        <div class="tab-panel" id="panelResults">
+                            <div class="summary" id="summary">
+                                <span class="hint">ยังไม่ได้ Run</span>
+                            </div>
+                            <div class="cases" id="cases"></div>
+                            <div class="detail" id="detail">
+                                <div class="empty">ผลการ grade จะแสดงที่นี่</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="editor-pane">
+                    <span class="editor-flag" id="editorFlag" hidden></span>
+                    <div class="editor-wrap" id="editorWrap">
+                        <pre class="hl" id="hl" aria-hidden="true"><code></code></pre>
+                        <textarea id="editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="เลือกโจทย์แล้วพิมพ์โค้ดของคุณที่นี่ — หรือกด Run โดยเว้นว่างเพื่อรันเฉลย"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="solModal" hidden>
+        <div class="modal">
+            <div class="modal-head">
+                <span class="title"><span class="ic" data-ic="key"></span> เฉลย</span>
+                <span class="fname" id="solName"></span>
+                <span class="grow"></span>
+                <button class="icon-btn" id="solCopy"><span class="ic" data-ic="copy"></span> คัดลอก</button>
+                <button class="icon-btn" id="solClose"><span class="ic" data-ic="x"></span> ปิด</button>
+            </div>
+            <pre class="hl modal-code" id="solCode"><code></code></pre>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

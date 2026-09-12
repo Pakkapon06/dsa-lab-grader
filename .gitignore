@@ -1,0 +1,16 @@
+# build artifacts
+*.exe
+_gen.exe
+*.o
+*.out
+
+# grader runtime
+_grader/node_modules/
+
+# OS junk
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# local editor / Claude settings
+.claude/
