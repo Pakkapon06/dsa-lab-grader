@@ -13,7 +13,7 @@ node _grader/server.js
 
 เปิด http://localhost:5599 → เลือกโจทย์จากซ้าย → พิมพ์โค้ด → กด **Run**
 
-- Windows: ดับเบิลคลิก `_grader/run-grader.cmd` ก็ได้
+- Windows: ดับเบิลคลิก `_grader/run-grader.cmd` — หรือรัน `_grader/create-shortcut.ps1` หนึ่งครั้งเพื่อสร้าง `Lab Grader.lnk` (มี icon สวย ๆ) ไว้ดับเบิลคลิก
 - Linux/macOS: `bash _grader/run-grader.sh`
 
 grader หา compiler ให้อัตโนมัติ (MSYS2 / MinGW / `/usr/bin` / PATH) — ถ้าอยู่ที่อื่นตั้ง env `GRADER_GPP` / `GRADER_GCC` ชี้เอง
@@ -23,8 +23,10 @@ grader หา compiler ให้อัตโนมัติ (MSYS2 / MinGW / `/u
 ```
 Lab/
 ├── _grader/            เว็บ grader (Node built-in ล้วน ไม่ต้อง npm install)
-├── Lab1/ … Lab8/       โจทย์จริง 8 Lab × 3 ข้อ (PDF + เฉลย + .in/.ans)
-├── Practice/           โจทย์ฝึก original เพิ่มเติม
+├── problems/           โจทย์ทั้งหมด
+│   ├── Lab1/ … Lab8/   โจทย์จริง 8 Lab × 3 ข้อ (PDF + เฉลย + .in/.ans)
+│   └── Practice/       โจทย์ฝึก original เพิ่มเติม
+├── CLAUDE.md
 └── README.md
 ```
 

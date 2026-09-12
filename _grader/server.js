@@ -4,7 +4,11 @@ const path = require("path");
 const os = require("os");
 const { spawn, spawnSync } = require("child_process");
 
-const ROOT = path.resolve(__dirname, "..");
+const ROOT = process.env.GRADER_ROOT
+    ? path.resolve(process.env.GRADER_ROOT)
+    : fs.existsSync(path.join(__dirname, "..", "problems"))
+    ? path.join(__dirname, "..", "problems")
+    : path.resolve(__dirname, "..");
 const PUBLIC = path.join(__dirname, "public");
 const PORT = process.env.GRADER_PORT ? Number(process.env.GRADER_PORT) : 5599;
 
@@ -410,6 +414,8 @@ function serveStatic(req, res, url) {
                 ? "text/javascript; charset=utf-8"
                 : ext === ".css"
                 ? "text/css; charset=utf-8"
+                : ext === ".svg"
+                ? "image/svg+xml"
                 : "application/octet-stream";
         res.writeHead(200, { "Content-Type": type });
         res.end(data);

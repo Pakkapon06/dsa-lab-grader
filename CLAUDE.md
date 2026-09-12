@@ -15,9 +15,11 @@
 ## โครงสร้างโปรเจกต์
 
 ```
-Lab/
-├── Lab1/  Lab2/  Lab3/ ...              ← โฟลเดอร์ Lab + เลขลำดับ
-│   └── <ชื่อโจทย์>/                      ← 3 โจทย์ต่อ Lab
+Lab/                                     ← git root (มี _grader/ + problems/)
+├── _grader/                             ← เว็บ grader (ดู _grader/README.md)
+└── problems/
+    ├── Lab1/  Lab2/  Lab3/ ...          ← โฟลเดอร์ Lab + เลขลำดับ
+    │   └── <ชื่อโจทย์>/                  ← 3 โจทย์ต่อ Lab
 │       ├── prob-[Lab DSA-69 NN] <ชื่อ>.pdf   ← คำถาม/คำอธิบายโจทย์
 │       ├── 1.in, 2.in, 3.in ...              ← ตัวอย่าง input
 │       ├── 1.ans, 2.ans, 3.ans ...           ← output ที่ถูกต้อง (จับคู่กับ .in ที่เลขเดียวกัน)

@@ -177,7 +177,6 @@ async function loadLabs() {
     const sidebar = $("sidebar");
     sidebar.innerHTML = '<div class="empty">กำลังสแกน…</div>';
     const data = await api("/api/labs");
-    $("rootPath").textContent = data.root;
     if (!data.labs.length) { sidebar.innerHTML = '<div class="empty">ไม่พบโฟลเดอร์ Lab</div>'; return; }
     sidebar.innerHTML = "";
     for (const lab of data.labs) {
@@ -204,6 +203,10 @@ async function loadLabs() {
             row.onclick = () => selectProblem(p.rel, row);
             sidebar.appendChild(row);
         }
+    }
+    if (!state.rel) {
+        const first = sidebar.querySelector(".prob");
+        if (first) selectProblem(first.dataset.rel, first);
     }
 }
 
