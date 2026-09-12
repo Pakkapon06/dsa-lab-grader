@@ -1,5 +1,28 @@
 const $ = (id) => document.getElementById(id);
-const state = { rel: null, lang: "cpp", statement: null, solution: "", results: [], active: null, drafts: {} };
+const state = { rel: null, lang: "cpp", statement: null, solution: "", results: [], active: null, drafts: {}, status: {}, history: [] };
+
+function saveStatus() { try { localStorage.setItem("grader-status", JSON.stringify(state.status)); } catch {} }
+function saveHistory() { try { localStorage.setItem("grader-history", JSON.stringify(state.history)); } catch {} }
+function recordRun(entry) {
+    state.status[entry.rel] = { verdict: entry.verdict, ac: entry.ac, total: entry.total, when: entry.when, label: entry.label };
+    saveStatus();
+    state.history.unshift(entry);
+    if (state.history.length > 100) state.history.length = 100;
+    saveHistory();
+    updateSidebarDot(entry.rel);
+}
+function updateSidebarDot(rel) {
+    const row = document.querySelector('.prob[data-rel="' + cssEsc(rel) + '"]');
+    if (row) applyDot(row.querySelector(".dot"), rel, row.dataset.hasCode === "1");
+}
+function cssEsc(s) { return (window.CSS && CSS.escape) ? CSS.escape(s) : s.replace(/"/g, '\\"'); }
+function applyDot(dot, rel, hasCode) {
+    const st = state.status[rel];
+    dot.classList.remove("ac", "wa", "idle");
+    if (st) dot.classList.add(st.verdict === "AC" ? "ac" : "wa");
+    else dot.classList.add("idle");
+    dot.title = st ? `${st.label || st.ac + "/" + st.total} (รันในเครื่องนี้)` : "ยังไม่ได้ Run";
+}
 
 function saveDraft() {
     if (!state.rel) return;
@@ -29,6 +52,7 @@ const ICONS = {
     play: '<polygon points="6 3 20 12 6 21 6 3" fill="currentColor" stroke="none"/>',
     x: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
     copy: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+    history: '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
 };
 function svg(name) {
     return '<svg class="ic-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (ICONS[name] || "") + "</svg>";
@@ -96,6 +120,32 @@ function switchTab(name) {
     document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
     $("panelStatement").classList.toggle("active", name === "statement");
     $("panelResults").classList.toggle("active", name === "results");
+    $("panelHistory").classList.toggle("active", name === "history");
+    if (name === "history") renderHistory();
+}
+
+function renderHistory() {
+    const list = $("historyList");
+    if (!state.history.length) {
+        list.innerHTML = '<div class="empty">ยังไม่มีประวัติ — กด Run เพื่อเริ่ม</div>';
+        return;
+    }
+    list.innerHTML = state.history
+        .map((h) => {
+            const time = new Date(h.when).toLocaleString("th-TH", { dateStyle: "short", timeStyle: "medium" });
+            const cls = h.verdict === "AC" ? "ac" : "fail";
+            return '<div class="hist-row" data-rel="' + escapeHtml(h.rel) + '">' +
+                '<span class="hist-badge ' + cls + '">' + escapeHtml(h.label) + "</span>" +
+                '<span class="hist-rel">' + escapeHtml(h.rel) + "</span>" +
+                '<span class="hist-time">' + escapeHtml(time) + "</span></div>";
+        })
+        .join("");
+    list.querySelectorAll(".hist-row").forEach((r) => {
+        r.onclick = () => {
+            const row = document.querySelector('.prob[data-rel="' + cssEsc(r.dataset.rel) + '"]');
+            if (row) selectProblem(r.dataset.rel, row);
+        };
+    });
 }
 
 /* ---------- minimal markdown ---------- */
@@ -190,11 +240,12 @@ async function loadLabs() {
             const row = document.createElement("div");
             row.className = "prob";
             row.dataset.rel = p.rel;
+            row.dataset.hasCode = p.hasCode ? "1" : "0";
             const dot = document.createElement("span");
-            dot.className = "dot " + (p.hasCode ? "has" : "none");
-            dot.title = p.hasCode ? "มีเฉลย" : "ยังไม่มีเฉลย";
+            dot.className = "dot";
+            applyDot(dot, p.rel, p.hasCode);
             const name = document.createElement("span");
-            name.className = "name";
+            name.className = "name" + (p.hasCode ? "" : " no-sol");
             name.textContent = p.name;
             const tc = document.createElement("span");
             tc.className = "tc";
@@ -299,11 +350,13 @@ function renderResults(res) {
         $("summary").innerHTML = '<span class="verdict v-CE">CE</span> <span class="hint">compile error</span>';
         $("cases").innerHTML = "";
         $("detail").innerHTML = '<div class="compile-err">' + escapeHtml(res.stderr) + "</div>";
+        recordRun({ rel: state.rel, when: Date.now(), verdict: "CE", ac: 0, total: 0, label: "CE", mode: res.mode || "" });
         return;
     }
     state.results = res.results;
     const total = res.results.length;
     const ac = res.results.filter((r) => r.verdict === "AC").length;
+    recordRun({ rel: state.rel, when: Date.now(), verdict: ac === total && total > 0 ? "AC" : "FAIL", ac, total, label: ac + " / " + total + " AC", mode: res.mode });
     $("summary").innerHTML =
         '<span class="score ' + (ac === total ? "pass" : "fail") + '">' + ac + " / " + total + '<span class="lab">AC</span></span>' +
         '<span class="meta">mode ' + res.mode + " · " + res.timeoutMs + "ms" +
@@ -385,6 +438,9 @@ function toggleTheme() {
 (function init() {
     try { const t = localStorage.getItem("grader-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch {}
     try { state.drafts = JSON.parse(localStorage.getItem("grader-drafts") || "{}") || {}; } catch { state.drafts = {}; }
+    try { state.status = JSON.parse(localStorage.getItem("grader-status") || "{}") || {}; } catch { state.status = {}; }
+    try { state.history = JSON.parse(localStorage.getItem("grader-history") || "[]") || []; } catch { state.history = []; }
+    $("clearHistBtn").onclick = () => { if (confirm("ล้างประวัติทั้งหมด?")) { state.history = []; saveHistory(); renderHistory(); } };
     $("gradeBtn").onclick = grade;
     $("saveBtn").onclick = save;
     $("solBtn").onclick = openSolution;

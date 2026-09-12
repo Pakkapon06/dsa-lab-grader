@@ -53,6 +53,7 @@
                     <div class="tabbar">
                         <button class="tab active" id="tabStatement" data-tab="statement"><span class="ic" data-ic="file"></span> โจทย์</button>
                         <button class="tab" id="tabResults" data-tab="results"><span class="ic" data-ic="check"></span> ผล Grader</button>
+                        <button class="tab" id="tabHistory" data-tab="history"><span class="ic" data-ic="history"></span> ประวัติ</button>
                     </div>
                     <div class="tab-body">
                         <div class="tab-panel active" id="panelStatement">
@@ -66,6 +67,13 @@
                             <div class="detail" id="detail">
                                 <div class="empty">ผลการ grade จะแสดงที่นี่</div>
                             </div>
+                        </div>
+                        <div class="tab-panel" id="panelHistory">
+                            <div class="history-head">
+                                <span class="hint">ประวัติการ Run (เก็บในเครื่องนี้)</span>
+                                <button class="btn ghost" id="clearHistBtn">ล้างประวัติ</button>
+                            </div>
+                            <div class="history-list" id="historyList"></div>
                         </div>
                     </div>
                 </div>
